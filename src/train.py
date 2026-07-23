@@ -2,7 +2,9 @@ from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-import joblib
+import mlflow
+import mlflow.sklearn
+
 
 
 def load_data():
@@ -30,22 +32,21 @@ def evaluate_model(model, X_test,y_test):
     return accuracy
 
 
-def save_model(model):
-    joblib.dump(model,"models/random_forest.joblib")
-    
-
 def main():
-    X,y = load_data()
+    with mlflow.start_run():
+        X,y = load_data()
 
-    model, X_test, y_test =train_model(X,y)
+        model, X_test, y_test =train_model(X,y)
 
-    accuracy= evaluate_model(model,X_test,y_test)
-    
-    print(f"Accuracy:{accuracy:.2f}")
+        accuracy= evaluate_model(model,X_test,y_test)
 
-    save_model(model)
+        mlflow.log_metric("accuracy", accuracy)
 
-    print("Model  saved !!")
+        mlflow.sklearn.log_model(model, "model")
+
+        print(f"Accuracy:{accuracy:.2f}")
+
+        print("Training completed successfully!")
 
 
 if __name__== "__main__":
@@ -60,44 +61,3 @@ if __name__== "__main__":
 
 
 
-
-"""
-cancer= load_breast_cancer() # the dataset
-
-X=cancer.data  # cancer.data ou lautre cancer["data"] 
-y=cancer.target
-
-# composer data
-X_train,X_test,y_train,y_test=train_test_split(
-    X,
-    y,
-    test_size=0.2,
-    random_state=42
-) # with random Les données de test sont exactement les mêmes , La seule chose qui a changé est le modèle , 42 cest seulement une convention meme 10 ou 7 vont fonctionner
-
-#creation du modele
-model=RandomForestClassifier()
-
-#Entrainer
-model.fit(X_train,y_train)
-
-#predire
-predictions=model.predict(X_test)
-
-#evaluer
-accuracy=accuracy_score(y_test,predictions)
-
-print(f"Accuracy:{accuracy:.2f}")
-
-#save the model
-joblib.dump(model,"models/random_forest.joblib")
-==
-def save_model(model):
-    model_path=joblib.dump(model,"models/random_forest.joblib")
-    return model_path
-
-    model_path = save_model(model)
-
-    print(f"Model saved in: {model_path}")
-
-"""
