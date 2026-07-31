@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import mlflow
+from mlflow import MlflowClient
 import mlflow.sklearn
 
 
@@ -42,8 +43,14 @@ def main():
 
         mlflow.log_metric("accuracy", accuracy)
 
-        mlflow.sklearn.log_model(model, "model")
-
+        #mlflow.sklearn.log_model(model, "model")
+        
+        mlflow.sklearn.log_model(
+            sk_model=model,
+            artifact_path="model",
+            registered_model_name="BreastCancerModel"
+        )
+        
         print(f"Accuracy:{accuracy:.2f}")
 
         print("Training completed successfully!")

@@ -6,6 +6,7 @@ app=FastAPI()
 
 model= joblib.load("models/random_forest.joblib")
 
+
 labels ={
     0: "malignant",
     1:"benign"
@@ -81,10 +82,25 @@ def predict(patient:Patient):
 
     prediction = model.predict(features)
 
+    print(f"Model id: {id(model)}")
+
     return {
     "prediction":labels[int(prediction[0])]
     }
 
+
+@app.post("/reload")
+def reload_model():
+
+    global model
+
+    model= joblib.load(
+        "models/random_forest.joblib"
+    )
+
+    return {
+        "message": "Model reloaded successfully"
+    }
 
 
 

@@ -1,0 +1,23 @@
+artifact_path: file:C:/Users/user/mlops-agentic-ai/mlruns/0/models/m-a297e1c39d9d4850b878e224e420654d/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.skops
+    predict_fn: predict
+    python_version: 3.13.7
+  sklearn:
+    code: null
+    pickled_model: model.skops
+    serialization_format: skops
+    sklearn_version: 1.9.0
+    skops_trusted_types: null
+mlflow_version: 3.14.0
+model_id: m-a297e1c39d9d4850b878e224e420654d
+model_size_bytes: 1996825
+model_uuid: m-a297e1c39d9d4850b878e224e420654d
+prompts: null
+run_id: 4dbe671617b74beab0620230f68c973c
+utc_time_created: '2026-07-25 14:19:32.336739'
