@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
+from src.monitoring.logger import log_prediction 
+
 
 app=FastAPI()
 
@@ -82,10 +84,13 @@ def predict(patient:Patient):
 
     prediction = model.predict(features)
 
-    print(f"Model id: {id(model)}")
+    prediction_label=labels[int(prediction[0])]
+    log_prediction(features,  prediction_label)
 
+    print(f"Model id: {id(model)}")
+    
     return {
-    "prediction":labels[int(prediction[0])]
+    "prediction":prediction_label
     }
 
 
