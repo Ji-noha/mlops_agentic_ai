@@ -1,13 +1,27 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
-from src.monitoring.logger import log_prediction 
+from src.monitoring.logger import log_prediction
+import time
+import json 
+from prometheus_client import generate_latest
+from fastapi.responses import Response
+from src.monitoring.prometheus_metrics import (
+    prediction_counter,
+    response_time,
+    error_counter,
+    model_version
+)
 
 
 app=FastAPI()
 
 model= joblib.load("models/random_forest.joblib")
 
+with open("current_version.json") as f:
+    version= json.load(f)["current_version"]
+
+model_version.set(version)
 
 labels ={
     0: "malignant",
@@ -48,7 +62,10 @@ class Patient(BaseModel):
 
 @app.post("/predict")
 
+
 def predict(patient:Patient):
+    start=time.time()
+
     features= [[
     patient.mean_radius,
     patient.mean_texture,
@@ -82,10 +99,18 @@ def predict(patient:Patient):
     patient.worst_fractal_dimension,
     ]]
 
-    prediction = model.predict(features)
+    try:
+        prediction = model.predict(features)
 
-    prediction_label=labels[int(prediction[0])]
-    log_prediction(features,  prediction_label)
+        duration=time.time() -start
+        response_time.observe(duration)
+        prediction_counter.inc()
+
+        prediction_label=labels[int(prediction[0])]
+        log_prediction(features,  prediction_label)
+    except Exception:
+        error_counter.inc()
+        raise
 
     print(f"Model id: {id(model)}")
     
@@ -103,12 +128,18 @@ def reload_model():
         "models/random_forest.joblib"
     )
 
+    with open("current_version.json") as f:
+        version = json.load(f)["current_version"]
+    model_version.set(version)
+
     return {
         "message": "Model reloaded successfully"
     }
 
-
-
-
-
-
+@app.get("/metrics")
+def metrics():
+    return Response(
+        generate_latest(),
+        media_type="text/plain"
+    )
+    
