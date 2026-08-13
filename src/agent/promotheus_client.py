@@ -1,0 +1,28 @@
+import requests
+
+PROMETHEUS_URL = "http://localhost:9090"
+
+
+def query_prometheus(query):
+    response = requests.get(
+        PROMETHEUS_URL + "/api/v1/query",
+        params={
+            "query": query
+        }
+    )
+
+    data = response.json()
+
+    return float(data["data"]["result"][0]["value"][1])
+
+
+def get_prediction_count():
+    return query_prometheus("prediction_total")
+
+
+def get_model_version():
+    return query_prometheus("model_version")
+
+
+def get_errors_count():
+    return query_prometheus("prediction_errors_total")

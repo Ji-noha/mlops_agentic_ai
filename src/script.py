@@ -14,3 +14,6 @@ import mlflow
 from agent.observer import get_latest_model_v
 
 print(get_latest_model_v())
+
+
+
