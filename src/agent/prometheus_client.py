@@ -26,3 +26,7 @@ def get_model_version():
 
 def get_errors_count():
     return query_prometheus("prediction_errors_total")
+
+def get_response_time():
+    query = "rate(response_time_seconde_sum[5m])/rate(response_time_seconde_count[5m])"
+    return query_prometheus(query)

@@ -2,6 +2,7 @@ import mlflow
 import joblib
 import requests
 import json
+import subprocess
 
 def update_model(version):
 
@@ -27,7 +28,21 @@ def update_model(version):
     else:
         print("Reload failed")
 
+def alert():
+    print("Anomaly detected!")
 
-if __name__ == "__main__":
-    update_model()
 
+def retrain_model():
+
+    result = subprocess.run(
+        ["airflow", "dags", "trigger", "train_model"],
+        capture_output=True,
+        text=True
+    )
+
+    if result.returncode == 0:
+        print("Retraining DAG triggered successfully.")
+        print(result.stdout)
+    else:
+        print("Failed to trigger retraining.")
+        print(result.stderr)
