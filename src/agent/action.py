@@ -31,7 +31,6 @@ def update_model(version):
 def alert():
     print("Anomaly detected!")
 
-
 def retrain_model():
 
     result = subprocess.run(
